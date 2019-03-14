@@ -34,6 +34,7 @@ do_deploy() {
 
     download_cli "${CURRENT_OLDEST_VERSION}" "${cli_bin}"
 
+    # Original name of migrate-from-v1 was upgrade-from-v1
     "${cli_bin}" upgrade-from-v1 "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
@@ -43,4 +44,9 @@ do_deploy() {
         --skip-preflight \
         --self-test \
         --yes
+}
+
+do_prepare_upgrade() {
+    automate-ctl stop
+    do_prepare_upgrade_default
 }
