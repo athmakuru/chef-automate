@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
@@ -52,6 +53,8 @@ var backupCmdFlags = struct {
 	s3SessionToken string
 
 	sha256 string
+
+	patchConfigPath string
 }{}
 
 func init() {
@@ -92,6 +95,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.yes, "yes", "", false, "Skip bootstrapping the machine with Habitat")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.sha256, "sha256", "", "The SHA256 checksum of the backup")
 	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
+	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
 	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 120, "How long to wait for a operation to complete before raising an error")
@@ -634,11 +638,20 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 
+	var cfg *dc.AutomateConfig
+	if backupCmdFlags.patchConfigPath != "" {
+		cfg, err = dc.LoadUserOverrideConfigFile(backupCmdFlags.patchConfigPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+	}
+
 	rt.Upgrade = backupCmdFlags.upgrade
 	rt.OverrideOrigin = backupCmdFlags.overrideOrigin
 	rt.Channel = backupCmdFlags.channel
 	rt.Airgap = backupCmdFlags.airgap != ""
 	rt.Sha256 = backupCmdFlags.sha256
+	rt.PatchConfig = cfg
 
 	if err := locationSpec.ConfigureBackupRestoreTask(rt); err != nil {
 		return status.Annotate(err, status.MarshalError)
