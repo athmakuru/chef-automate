@@ -113,7 +113,8 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
       type: { name: 'profile_id' },
       value: { text: profile.id }
     };
-
+    listParams['sort'] = 'name';
+    listParams['order'] = 'asc';
     this.statsService.getNodes(filters, listParams).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
