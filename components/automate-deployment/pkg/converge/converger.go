@@ -152,32 +152,34 @@ func (converger *converger) run() {
 			return
 		case req := <-converger.inbox:
 			logrus.Debugf("got message %s while %s", req, converger.currentState)
-			nextState, err := converger.currentState.ProcessMessage(converger, req)
-			converger.setState(nextState, false)
+			nextState, stopTimer, err := converger.currentState.ProcessMessage(converger, req)
+			if stopTimer {
+				converger.currentState.StopTimer()
+			}
+			converger.setState(nextState)
 			req.SendResponse(err)
 		case d := <-converger.debug:
 			d.Do(converger)
 		case <-converger.currentState.TimeoutChan():
 			logrus.Debugf("timed out while %s", converger.currentState)
-			nextState, err := converger.currentState.ProcessMessage(
+			nextState, _, err := converger.currentState.ProcessMessage(
 				converger,
 				&timeout{})
 			if err != nil {
 				logrus.WithError(err).Error("error processing timeout event")
 			}
-			converger.setState(nextState, true)
+			converger.setState(nextState)
 		}
 	}
 }
 
-func (converger *converger) setState(s state, timedout bool) {
+func (converger *converger) setState(s state) {
 	if s.String() != converger.currentState.String() {
 		logrus.WithFields(logrus.Fields{
 			"old_state": converger.currentState,
 			"new_state": s,
 		}).Debug("converger state transition")
 	}
-	converger.currentState.StopTimer(timedout)
 	converger.currentState = s
 }
 
@@ -189,17 +191,18 @@ type state interface {
 	// ProcessMessage takes the converger and the most recently
 	// received message. The returned state is the next state of
 	// the fsm. The returned error may be send to the sender of
-	// the message.
-	ProcessMessage(*converger, message) (state, error)
+	// the message. The retruned bool indicates whether we should
+	// reset the current state timeout before moving to the next
+	// state.
+	ProcessMessage(*converger, message) (state, bool, error)
 	// TimeoutChan returns a channel that should delivery a
 	// message when this state has timed out. If a message is
 	// received on the timeout channel a timeout message will be
 	// sent to the current state.
 	TimeoutChan() <-chan time.Time
 	// StopTimer should correctly stop any timers or resources
-	// associated with the TimeoutChan. True will be passed if we
-	// have read any values off of the TimeoutChan()
-	StopTimer(bool)
+	// associated with the TimeoutChan.
+	StopTimer()
 	// String is a convenience method used for logging. states should
 	// have uniq string descriptors so we can more easily
 	// conditionally log.
@@ -310,14 +313,14 @@ func (r *reconfigureDone) String() string { return "reconfigureDone" }
 // never times out.
 type idle struct{}
 
-func (i *idle) ProcessMessage(c *converger, msg message) (state, error) {
+func (i *idle) ProcessMessage(c *converger, msg message) (state, bool, error) {
 	switch msg.(type) {
 	case *convergeRequest:
 		req := msg.(*convergeRequest)
 		convergePlan, err := c.compiler.Compile(req.desiredState)
 		if err != nil {
 			logrus.WithError(err).Error("Failed to compile")
-			return i, err
+			return i, false, err
 		}
 		err = convergePlan.Execute(req.eventSink)
 		return i.handleError(err)
@@ -326,38 +329,38 @@ func (i *idle) ProcessMessage(c *converger, msg message) (state, error) {
 		convergePlan, err := c.compiler.Compile(req.desiredState)
 		if err != nil {
 			logrus.WithError(err).Error("Failed to compile")
-			return i, err
+			return i, false, err
 		}
 		err = convergePlan.Execute(req.eventSink)
 		return i.handleError(err)
 	case *reconfigureDone:
 		logrus.Warn("received reconfigureDone when in idle state. We should have been in waitingForReconfigure")
-		return i, nil
+		return i, false, nil
 	case *timeout:
 		logrus.Warn("received timeout when in idle state.")
-		return i, nil
+		return i, false, nil
 	default:
-		return i, UnknownMessageError(msg, i)
+		return i, false, UnknownMessageError(msg, i)
 	}
 }
 
-func (i *idle) handleError(err error) (state, error) {
+func (i *idle) handleError(err error) (state, bool, error) {
 	switch err {
 	case api.ErrRestartPending:
-		return newWaitingForRestart(), err
+		return newWaitingForRestart(), false, err
 	case api.ErrSelfReconfigurePending:
-		return newWaitingForReconfigure(false), err
+		return newWaitingForReconfigure(false), false, err
 	case api.ErrSelfUpgradePending:
 		// NOTE(ssd) 2019-04-19: A self-upgrade is
 		// essentially just a restart from hab-sup.
-		return newWaitingForRestart(), err
+		return newWaitingForRestart(), false, err
 	default:
-		return i, err
+		return i, false, err
 	}
 }
 
 func (i *idle) TimeoutChan() <-chan time.Time { return nil }
-func (i *idle) StopTimer(_ bool)              {}
+func (i *idle) StopTimer()                    {}
 func (i *idle) String() string                { return "idle" }
 
 // waitingForRestart is a converger state that we enter whenever we
@@ -372,20 +375,20 @@ func newWaitingForRestart() *waitingForRestart {
 	}
 }
 
-func (w *waitingForRestart) ProcessMessage(_ *converger, msg message) (state, error) {
+func (w *waitingForRestart) ProcessMessage(_ *converger, msg message) (state, bool, error) {
 	switch msg.(type) {
 	case *timeout:
 		logrus.Info("timed out waiting for restart, re-entering idle state")
-		return &idle{}, nil
+		return &idle{}, true, nil
 	case *stopRequest, *convergeRequest:
 		logrus.Infof("ignoring message %v because we are waiting to be restarted", msg)
-		return w, api.ErrRestartPending
+		return w, false, api.ErrRestartPending
 	case *reconfigureDone:
 		logrus.Warn("reconfigureDone received when waiting for restart!")
-		return w, api.ErrRestartPending
+		return w, false, api.ErrRestartPending
 	default:
 		logrus.Infof("ignoring message %v because we are waiting to be restarted", msg)
-		return w, UnknownMessageError(msg, w)
+		return w, false, UnknownMessageError(msg, w)
 	}
 }
 
@@ -406,25 +409,25 @@ func newWaitingForReconfigure(sentSelfHup bool) *waitingForReconfigure {
 	}
 }
 
-func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state, error) {
+func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state, bool, error) {
 	switch msg.(type) {
 	case *timeout:
 		if !w.sentSelfHup {
 			logrus.Warnf("Expected HUP from habitat but none received after %s, sending HUP to self",
 				waitingForReconfigureTimeout)
 			c.selfHuper.Hup()
-			return newWaitingForReconfigure(true), nil
+			return newWaitingForReconfigure(true), true, nil
 		}
 		logrus.Warnf("Attempt to self-HUP also failed to result in a reconfigure after %s, giving up",
 			waitingForReconfigureTimeout)
-		return &idle{}, nil
+		return &idle{}, true, nil
 	case *reconfigureDone:
-		return &idle{}, nil
+		return &idle{}, true, nil
 	case *stopRequest, *convergeRequest:
 		logrus.Infof("ignoring message %v because we are waiting to be reconfigured", msg)
-		return w, api.ErrSelfReconfigurePending
+		return w, false, api.ErrSelfReconfigurePending
 	default:
-		return w, UnknownMessageError(msg, w)
+		return w, false, UnknownMessageError(msg, w)
 	}
 }
 
@@ -444,12 +447,11 @@ func (t *timeoutable) TimeoutChan() <-chan time.Time {
 	return t.timer.C
 }
 
-func (t *timeoutable) StopTimer(timedout bool) {
+func (t *timeoutable) StopTimer() {
 	if t.timer == nil {
 		return
 	}
-
-	if !t.timer.Stop() && !timedout {
+	if !t.timer.Stop() {
 		<-t.timer.C
 	}
 }
@@ -554,7 +556,7 @@ func (d debugSetReq) Do(c *converger) {
 	logrus.WithFields(logrus.Fields{
 		"new_state": d.newState,
 	}).Debug("setting state via converger debug message")
-	c.setState(d.newState, false)
+	c.setState(d.newState)
 	close(d.doneChan)
 }
 
