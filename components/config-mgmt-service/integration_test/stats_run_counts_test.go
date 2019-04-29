@@ -34,7 +34,7 @@ func TestStatsRunsCountsEmpty(t *testing.T) {
 func TestStatsRunsCountsWithTwoRuns(t *testing.T) {
 	// Generate the objects you want to ingest
 	runs := []iBackend.Run{
-		iBackend.Run{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid: newUUID(),
 				Status:     "success",
@@ -42,7 +42,7 @@ func TestStatsRunsCountsWithTwoRuns(t *testing.T) {
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(10),
 		},
-		iBackend.Run{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid: newUUID(),
 				Status:     "failure",
@@ -252,21 +252,21 @@ func TestStatsRunsCountsWrongParameters(t *testing.T) {
 	ctx := context.Background()
 
 	cases := []request.RunsCounts{
-		request.RunsCounts{Filter: []string{"platform=centos"}},
-		request.RunsCounts{Filter: []string{"wrong"}},
-		request.RunsCounts{Filter: []string{":success"}},
-		request.RunsCounts{Filter: []string{"platform:"}},
-		request.RunsCounts{Filter: []string{"platform:foo:bar"}},
-		request.RunsCounts{Start: "2000-00-00"},
-		request.RunsCounts{Start: "00-00-00"},
-		request.RunsCounts{Start: "18-10-10"},
-		request.RunsCounts{Start: "20-01-01"},
-		request.RunsCounts{Start: "17:01:01"},
-		request.RunsCounts{End: "01-01-1800"},
-		request.RunsCounts{End: "3000-12"},
-		request.RunsCounts{End: "2019"},
-		request.RunsCounts{End: "1888:01:01"},
-		request.RunsCounts{End: "2027/01/01"},
+		{Filter: []string{"platform=centos"}},
+		{Filter: []string{"wrong"}},
+		{Filter: []string{":success"}},
+		{Filter: []string{"platform:"}},
+		{Filter: []string{"platform:foo:bar"}},
+		{Start: "2000-00-00"},
+		{Start: "00-00-00"},
+		{Start: "18-10-10"},
+		{Start: "20-01-01"},
+		{Start: "17:01:01"},
+		{End: "01-01-1800"},
+		{End: "3000-12"},
+		{End: "2019"},
+		{End: "1888:01:01"},
+		{End: "2027/01/01"},
 	}
 
 	for _, test := range cases {

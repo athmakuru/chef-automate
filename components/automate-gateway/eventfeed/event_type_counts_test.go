@@ -59,11 +59,11 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 5,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "node",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "cookbook",
 					Count: 2,
 				},
@@ -79,11 +79,11 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 		return &complFeed.FeedSummaryResponse{
 			TotalEntries: 5,
 			EntryCounts: []*complFeed.EntryCount{
-				&complFeed.EntryCount{
+				{
 					Category: "scanjobs",
 					Count:    3,
 				},
-				&complFeed.EntryCount{
+				{
 					Category: "profile",
 					Count:    2,
 				},
@@ -102,19 +102,19 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 	assert.Equal(t, int64(10), eventCounts.Total, "Total number of counts should be ten")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "scanjobs",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "profile",
 			Count: 2,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "node",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "cookbook",
 			Count: 2,
 		},
@@ -142,11 +142,11 @@ func TestEventTypeCountsOneEmpty(t *testing.T) {
 		return &complFeed.FeedSummaryResponse{
 			TotalEntries: 5,
 			EntryCounts: []*complFeed.EntryCount{
-				&complFeed.EntryCount{
+				{
 					Category: "scanjobs",
 					Count:    3,
 				},
-				&complFeed.EntryCount{
+				{
 					Category: "profile",
 					Count:    2,
 				},
@@ -165,11 +165,11 @@ func TestEventTypeCountsOneEmpty(t *testing.T) {
 	assert.Equal(t, int64(5), eventCounts.Total, "Total number of counts should be five")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "scanjobs",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "profile",
 			Count: 2,
 		},
@@ -197,11 +197,11 @@ func TestEventTypeCountsConfigMgmtDown(t *testing.T) {
 		return &complFeed.FeedSummaryResponse{
 			TotalEntries: 5,
 			EntryCounts: []*complFeed.EntryCount{
-				&complFeed.EntryCount{
+				{
 					Category: "scanjobs",
 					Count:    3,
 				},
-				&complFeed.EntryCount{
+				{
 					Category: "profile",
 					Count:    2,
 				},
@@ -233,11 +233,11 @@ func TestEventTypeCountsComplianceDown(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 5,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "node",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "cookbook",
 					Count: 2,
 				},

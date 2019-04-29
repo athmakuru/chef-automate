@@ -57,15 +57,15 @@ func TestEventTaskCountsBothValues(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 6,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "create",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "update",
 					Count: 2,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "delete",
 					Count: 1,
 				},
@@ -113,15 +113,15 @@ func TestEventTaskCountsBothValues(t *testing.T) {
 	assert.Equal(t, int64(6), eventCounts.Total, "Total number of counts should be six")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "create",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "update",
 			Count: 2,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "delete",
 			Count: 1,
 		},
@@ -141,11 +141,11 @@ func TestEventTaskCountsOneEmpty(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 6,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "create",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "update",
 					Count: 2,
 				},
@@ -180,11 +180,11 @@ func TestEventTaskCountsOneEmpty(t *testing.T) {
 	assert.Equal(t, int64(6), eventCounts.Total, "Total number of counts should be five")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "create",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "update",
 			Count: 2,
 		},

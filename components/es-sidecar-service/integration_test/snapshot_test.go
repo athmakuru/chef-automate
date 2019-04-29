@@ -283,9 +283,9 @@ func TestCreateSnapshotStatus(t *testing.T) {
 }
 
 var testDocs = []testDocument{
-	testDocument{id_for_search: "3"},
-	testDocument{id_for_search: "2"},
-	testDocument{id_for_search: "1"},
+	{id_for_search: "3"},
+	{id_for_search: "2"},
+	{id_for_search: "1"},
 }
 
 func createDataForRestoreTests(t *testing.T, bc *elastic.BackupsConfig) {

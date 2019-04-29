@@ -91,11 +91,11 @@ func (m Backend) GetListForField(searchTerm string) ([]string, error) {
 
 func (m Backend) GetSuggestions(term string, text string) ([]backend.Suggestion, error) {
 	suggestions := []backend.Suggestion{
-		backend.Suggestion{
+		{
 			Text:  "Node 1",
 			Score: 4.4892697,
 		},
-		backend.Suggestion{
+		{
 			Text:  "ubuntu",
 			Score: 3.9768348,
 		},
@@ -107,11 +107,11 @@ func (m Backend) GetPolicyCookbooks(revisionID string) (backend.PolicyCookbooks,
 	return backend.PolicyCookbooks{
 		PolicyName: "infra_base",
 		CookbookLocks: []backend.PolicyCookbookLock{
-			backend.PolicyCookbookLock{
+			{
 				CookbookName: "apt",
 				PolicyID:     "any",
 			},
-			backend.PolicyCookbookLock{
+			{
 				CookbookName: "cookbook",
 				PolicyID:     "paula_smith",
 			},

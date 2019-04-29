@@ -103,17 +103,17 @@ func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 		Name:    "web",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::delete_validation",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "lamp2::default",
 				Skipped: false,
@@ -148,7 +148,7 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 		Name:    "none",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "test::default",
 				Skipped: false,
@@ -160,17 +160,17 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 		Name:    "web",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::delete_validation",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "lamp2::default",
 				Skipped: false,
@@ -205,7 +205,7 @@ func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 		Name:    "none",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "test::default",
 				Skipped: false,
@@ -217,32 +217,32 @@ func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 		Name:    "web3",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::delete_validation",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "lamp2::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "role",
 				Name:    "none",
 				Skipped: false,
 				Children: []iBackend.ExpandedRunListRunList{
-					iBackend.ExpandedRunListRunList{
+					{
 						Type:    "recipe",
 						Name:    "test::default",
 						Skipped: false,
 					},
-					iBackend.ExpandedRunListRunList{
+					{
 						Type:    "role",
 						Name:    "web3",
 						Skipped: true,

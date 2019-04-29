@@ -287,11 +287,11 @@ func TestCCRToRun(t *testing.T) {
 	assert.Contains(t, translatedRun.Cookbooks, "apt")
 	assert.Contains(t, translatedRun.Cookbooks, "aws")
 	var vCookbooks = []subject.VersionedCookbook{
-		subject.VersionedCookbook{
+		{
 			Name:    "apt",
 			Version: "2.9.2",
 		},
-		subject.VersionedCookbook{
+		{
 			Name:    "aws",
 			Version: "2.3.0",
 		},

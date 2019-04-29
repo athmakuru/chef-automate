@@ -11,11 +11,11 @@ import (
 
 func TestIsAuthorizedValidation_Action(t *testing.T) {
 	cases := map[bool][]string{ // valid/invalid -> input
-		true: []string{
+		true: {
 			"a:b:c",
 			"sOME:cAmeL:cAse",
 		},
-		false: []string{
+		false: {
 			"A:B:C",
 			"Titlecase:Not:Allowed",
 			"titlecase:Not:Allowed",

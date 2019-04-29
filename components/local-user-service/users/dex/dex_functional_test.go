@@ -29,7 +29,7 @@ func TestPasswordValidation(t *testing.T) {
 	clientID, clientSecret := "automate-api", "" // public client
 
 	connectors := map[string][]storage.Connector{
-		"local only": []storage.Connector{
+		"local only": {
 			{
 				ID:              "local",
 				Type:            "mockPassword",
@@ -38,7 +38,7 @@ func TestPasswordValidation(t *testing.T) {
 				Config:          []byte(fmt.Sprintf(`{"username":%q,"password":%q}`, "alice", "somethingStrange")),
 			},
 		},
-		"local + something else": []storage.Connector{
+		"local + something else": {
 			{
 				ID:              "local",
 				Type:            "mockPassword",

@@ -997,7 +997,7 @@ func TestNodeProjectRulesMatching(t *testing.T) {
 				},
 			},
 			rules: []*iam_v2.ProjectRule{
-				&iam_v2.ProjectRule{
+				{
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
@@ -1018,7 +1018,7 @@ func TestNodeProjectRulesMatching(t *testing.T) {
 				},
 			},
 			rules: []*iam_v2.ProjectRule{
-				&iam_v2.ProjectRule{
+				{
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
@@ -1027,7 +1027,7 @@ func TestNodeProjectRulesMatching(t *testing.T) {
 						},
 					},
 				},
-				&iam_v2.ProjectRule{
+				{
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
@@ -1048,7 +1048,7 @@ func TestNodeProjectRulesMatching(t *testing.T) {
 				},
 			},
 			rules: []*iam_v2.ProjectRule{
-				&iam_v2.ProjectRule{
+				{
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
@@ -1057,7 +1057,7 @@ func TestNodeProjectRulesMatching(t *testing.T) {
 						},
 					},
 				},
-				&iam_v2.ProjectRule{
+				{
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{

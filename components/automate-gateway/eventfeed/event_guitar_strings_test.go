@@ -35,15 +35,15 @@ func TestEventGuitarStringsNormal(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection:  make([]*cmsRes.EventCollection, 3),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection:  make([]*cmsRes.EventCollection, 3),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection:  make([]*cmsRes.EventCollection, 3),
 				},
@@ -61,15 +61,15 @@ func TestEventGuitarStringsNormal(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots:  make([]*complFeed.Timeslot, 3),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots:  make([]*complFeed.Timeslot, 3),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots:  make([]*complFeed.Timeslot, 3),
 				},
@@ -120,15 +120,15 @@ func TestEventGuitarStringsNotEnoughEventsStrings(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection:  make([]*cmsRes.EventCollection, 3), // error only 3 buckets
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
@@ -146,15 +146,15 @@ func TestEventGuitarStringsNotEnoughEventsStrings(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
@@ -198,15 +198,15 @@ func TestEventGuitarStringsToManyEventsStrings(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection:  make([]*cmsRes.EventCollection, 5), // error only 3 buckets
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
@@ -224,15 +224,15 @@ func TestEventGuitarStringsToManyEventsStrings(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
@@ -276,39 +276,39 @@ func TestEventGuitarStringsMergeOpenSlots(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{
+						{}, {
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "node", Count: 1},
+								{Name: "node", Count: 1},
 							},
 						},
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
+						{}, {},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{
+						{}, {},
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "cookbook", Count: 1},
+								{Name: "cookbook", Count: 1},
 							},
-						}, &cmsRes.EventCollection{},
+						}, {},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{
+						{}, {
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "item", Count: 1},
+								{Name: "item", Count: 1},
 							},
 						},
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{
+						{}, {
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "bag", Count: 1},
+								{Name: "bag", Count: 1},
 							},
 						},
 					},
@@ -327,37 +327,37 @@ func TestEventGuitarStringsMergeOpenSlots(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 1},
+								{Category: "scanjobs", Count: 1},
 							},
 						},
-						&complFeed.Timeslot{}, &complFeed.Timeslot{}, &complFeed.Timeslot{},
+						{}, {}, {},
 					},
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{}, &complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{
+						{}, {}, {},
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "profile", Count: 1},
+								{Category: "profile", Count: 1},
 							},
 						},
 					},
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{
+						{}, {},
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 1},
+								{Category: "scanjobs", Count: 1},
 							},
-						}, &complFeed.Timeslot{},
+						}, {},
 					},
 				},
 			},
@@ -411,40 +411,40 @@ func TestEventGuitarStringsMergeMultipleEventTypesAndCounts(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "node", Count: 5},
+								{Name: "node", Count: 5},
 							},
-						}, &cmsRes.EventCollection{}, &cmsRes.EventCollection{}, &cmsRes.EventCollection{},
+						}, {}, {}, {},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{
+						{}, {}, {},
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "cookbook", Count: 100},
+								{Name: "cookbook", Count: 100},
 							},
 						},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{
+						{}, {},
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "environment", Count: 999},
-								&cmsRes.EventCount{Name: "role", Count: 450},
-								&cmsRes.EventCount{Name: "cookbook", Count: 20},
-								&cmsRes.EventCount{Name: "bag", Count: 5},
-								&cmsRes.EventCount{Name: "scanjobs", Count: 100},
+								{Name: "environment", Count: 999},
+								{Name: "role", Count: 450},
+								{Name: "cookbook", Count: 20},
+								{Name: "bag", Count: 5},
+								{Name: "scanjobs", Count: 100},
 							},
-						}, &cmsRes.EventCollection{},
+						}, {},
 					},
 				},
 			},
@@ -461,37 +461,37 @@ func TestEventGuitarStringsMergeMultipleEventTypesAndCounts(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 10},
+								{Category: "scanjobs", Count: 10},
 							},
-						}, &complFeed.Timeslot{}, &complFeed.Timeslot{}, &complFeed.Timeslot{},
+						}, {}, {}, {},
 					},
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{}, &complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{
+						{}, {}, {},
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "profile", Count: 50},
+								{Category: "profile", Count: 50},
 							},
 						},
 					},
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{
+						{}, {},
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 500},
-								&complFeed.EntryCount{Category: "profile", Count: 100},
+								{Category: "scanjobs", Count: 500},
+								{Category: "profile", Count: 100},
 							},
-						}, &complFeed.Timeslot{},
+						}, {},
 					},
 				},
 			},
@@ -548,28 +548,28 @@ func TestEventGuitarStringsMergeBugAIA222(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{}, &cmsRes.EventCollection{}, &cmsRes.EventCollection{},
+						{}, {}, {}, {},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{},
+						{}, {}, {},
+						{},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{
+						{}, {},
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "profile", Count: 1},
+								{Name: "profile", Count: 1},
 							},
-						}, &cmsRes.EventCollection{},
+						}, {},
 					},
 				},
 			},
@@ -642,7 +642,7 @@ func TestEventGuitarStringsMissingString(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
@@ -650,7 +650,7 @@ func TestEventGuitarStringsMissingString(t *testing.T) {
 				// 	EventAction: "create",   // the missing string
 				//  Collection:  make([]*cmsRes.EventCollection, 4),
 				// },
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
@@ -668,15 +668,15 @@ func TestEventGuitarStringsMissingString(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
@@ -716,15 +716,15 @@ func TestEventGuitarStringsDuplicateString1(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "update", // the Duplicate string
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
@@ -742,15 +742,15 @@ func TestEventGuitarStringsDuplicateString1(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
@@ -790,15 +790,15 @@ func TestEventGuitarStringsDuplicateString2(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection:  make([]*cmsRes.EventCollection, 4),
 				},
@@ -816,15 +816,15 @@ func TestEventGuitarStringsDuplicateString2(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "update", // the Duplicate string
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots:  make([]*complFeed.Timeslot, 4),
 				},
@@ -872,37 +872,37 @@ func TestEventGuitarStringsConfigMgmtDown(t *testing.T) {
 			End:      request.End,
 			Interval: request.Interval,
 			ActionLines: []*complFeed.ActionLine{
-				&complFeed.ActionLine{
+				{
 					Action: "update",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 1},
+								{Category: "scanjobs", Count: 1},
 							},
 						},
-						&complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{},
+						{}, {},
+						{},
 					},
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "create",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{
+						{}, {},
+						{
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 2},
+								{Category: "scanjobs", Count: 2},
 							},
 						},
-						&complFeed.Timeslot{},
+						{},
 					},
 				},
-				&complFeed.ActionLine{
+				{
 					Action: "delete",
 					Slots: []*complFeed.Timeslot{
-						&complFeed.Timeslot{}, &complFeed.Timeslot{},
-						&complFeed.Timeslot{}, &complFeed.Timeslot{
+						{}, {},
+						{}, {
 							Counts: []*complFeed.EntryCount{
-								&complFeed.EntryCount{Category: "scanjobs", Count: 3},
+								{Category: "scanjobs", Count: 3},
 							},
 						},
 					},
@@ -954,37 +954,37 @@ func TestEventGuitarStringsComplianceDown(t *testing.T) {
 			End:          request.End,
 			HoursBetween: request.HoursBetween,
 			Strings: []*cmsRes.EventString{
-				&cmsRes.EventString{
+				{
 					EventAction: "update",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "bag", Count: 1},
+								{Name: "bag", Count: 1},
 							},
 						},
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{},
+						{}, {},
+						{},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "create",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{
+						{}, {},
+						{
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "cookbook", Count: 2},
+								{Name: "cookbook", Count: 2},
 							},
 						},
-						&cmsRes.EventCollection{},
+						{},
 					},
 				},
-				&cmsRes.EventString{
+				{
 					EventAction: "delete",
 					Collection: []*cmsRes.EventCollection{
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{},
-						&cmsRes.EventCollection{}, &cmsRes.EventCollection{
+						{}, {},
+						{}, {
 							EventsCount: []*cmsRes.EventCount{
-								&cmsRes.EventCount{Name: "node", Count: 3},
+								{Name: "node", Count: 3},
 							},
 						},
 					},
@@ -1086,19 +1086,19 @@ func TestEventGuitarStringsTimeZones(t *testing.T) {
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 
 	cases := []*agReq.EventStrings{
-		&agReq.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
 			Timezone:     "",
 		},
-		&agReq.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
 			Timezone:     "fake",
 		},
-		&agReq.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
@@ -1123,67 +1123,67 @@ func TestEventGuitarStringsStartAndEnd(t *testing.T) {
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 
 	cases := []agReq.EventStrings{
-		agReq.EventStrings{
+		{
 			Start:        "2018-01-06",
 			End:          "2018-01-01",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "2000-00-00",
 			End:          "2000-00-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "00-00-00",
 			End:          "00-00-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "18-10-10",
 			End:          "18-10-16",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "20-01-01",
 			End:          "20-01-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "17:01:01",
 			End:          "17:01:06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "01-01-2000",
 			End:          "06-01-2000",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "3000-12",
 			End:          "3006-12",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "2019",
 			End:          "2018",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "1888:01:01",
 			End:          "1888:01:06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		agReq.EventStrings{
+		{
 			Start:        "2027/01/01",
 			End:          "2027/01/08",
 			HoursBetween: 3,

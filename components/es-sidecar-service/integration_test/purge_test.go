@@ -62,9 +62,9 @@ func TestPurgeDocumentsFromIndexByAge(t *testing.T) {
 
 	// Note the additional -1 minute - this ensures
 	allDocs := []testDocument{
-		testDocument{id_for_search: "3-day", EndDate: now.AddDate(0, 0, -3)},
-		testDocument{id_for_search: "2-day", EndDate: now.AddDate(0, 0, -2)},
-		testDocument{id_for_search: "1-day", EndDate: now.AddDate(0, 0, -1)},
+		{id_for_search: "3-day", EndDate: now.AddDate(0, 0, -3)},
+		{id_for_search: "2-day", EndDate: now.AddDate(0, 0, -2)},
+		{id_for_search: "1-day", EndDate: now.AddDate(0, 0, -1)},
 	}
 	cases := []purgeDocTestCase{
 		// We added two docs, make sure that we end  with two docs

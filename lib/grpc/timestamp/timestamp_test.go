@@ -3,8 +3,8 @@ package timestamp
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -35,4 +35,3 @@ func TestTimestampString(t *testing.T) {
 		assert.Equal(t, test.expected, TimestampString(test.ts))
 	}
 }
-

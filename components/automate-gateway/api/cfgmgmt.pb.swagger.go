@@ -420,7 +420,7 @@ func init() {
           "description": "Repeated field of dynamically typed values."
         }
       },
-      "description": "` + "`" + `ListValue` + "`" + ` is a wrapper around a repeated field of values.\n\nThe JSON representation for ` + "`" + `ListValue` + "`" + ` is JSON array."
+      "description": "`+"`"+`ListValue`+"`"+` is a wrapper around a repeated field of values.\n\nThe JSON representation for `+"`"+`ListValue`+"`"+` is JSON array."
     },
     "protobufNullValue": {
       "type": "string",
@@ -428,7 +428,7 @@ func init() {
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
+      "description": "`+"`"+`NullValue`+"`"+` is a singleton enumeration to represent the null value for the\n`+"`"+`Value`+"`"+` type union.\n\n The JSON representation for `+"`"+`NullValue`+"`"+` is JSON `+"`"+`null`+"`"+`.\n\n - NULL_VALUE: Null value."
     },
     "protobufStruct": {
       "type": "object",
@@ -441,7 +441,7 @@ func init() {
           "description": "Unordered map of dynamically typed values."
         }
       },
-      "description": "` + "`" + `Struct` + "`" + ` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, ` + "`" + `Struct` + "`" + `\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for ` + "`" + `Struct` + "`" + ` is JSON object."
+      "description": "`+"`"+`Struct`+"`"+` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `+"`"+`Struct`+"`"+`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `+"`"+`Struct`+"`"+` is JSON object."
     },
     "protobufValue": {
       "type": "object",
@@ -470,10 +470,10 @@ func init() {
         },
         "list_value": {
           "$ref": "#/definitions/protobufListValue",
-          "description": "Represents a repeated ` + "`" + `Value` + "`" + `."
+          "description": "Represents a repeated `+"`"+`Value`+"`"+`."
         }
       },
-      "description": "` + "`" + `Value` + "`" + ` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for ` + "`" + `Value` + "`" + ` is JSON value."
+      "description": "`+"`"+`Value`+"`"+` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `+"`"+`Value`+"`"+` is JSON value."
     },
     "queryPagination": {
       "type": "object",

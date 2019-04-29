@@ -890,7 +890,7 @@ func cmsFixedEvents(t *testing.T) *cmsRes.Events {
 	assert.Nil(t, err)
 	var (
 		fixedEvents = []*cmsRes.Event{
-			&cmsRes.Event{
+			{
 				EventType:       "node",
 				Task:            "update",
 				Timestamp:       timestamp1,
@@ -962,7 +962,7 @@ func complianceEventFixedEvents(t *testing.T) *automate_feed.FeedResponse {
 
 	var (
 		fixedEvents = []*automate_feed.FeedEntry{
-			&automate_feed.FeedEntry{
+			{
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",

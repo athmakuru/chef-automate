@@ -706,7 +706,7 @@ func nodeFieldEqualToValue(node iBackend.Node, key string, value string) bool {
 // twoNodeArray returns an Array of 2 Nodes
 func twoNodeArray() []iBackend.Node {
 	return []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "success",
@@ -716,7 +716,7 @@ func twoNodeArray() []iBackend.Node {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "missing",

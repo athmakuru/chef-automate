@@ -19,10 +19,10 @@ func TestLoadValidConfigFromToml(t *testing.T) {
 	assert.Equal(
 		t,
 		map[string]storage.ServiceConfig{
-			"foo": storage.ServiceConfig{
+			"foo": {
 				Address: "4.3.2.1:9999",
 			},
-			"data-lifecycle-service": storage.ServiceConfig{
+			"data-lifecycle-service": {
 				Address: "1.2.3.4:1234",
 				Secure:  true,
 			},

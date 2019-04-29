@@ -10,7 +10,7 @@ func TestConfigureDefaultEndpoints(t *testing.T) {
 	assert := assert.New(t)
 	cc := &ClientConfig{
 		Endpoints: map[string]ConnectionOptions{
-			"teams-service": ConnectionOptions{
+			"teams-service": {
 				Target: "192.168.0.123:9966",
 				Secure: false,
 			},

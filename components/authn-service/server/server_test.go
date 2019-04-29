@@ -98,7 +98,7 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 
 	// inject proper metadata header for (mock-)oidc
 	ctx = metadata.NewOutgoingContext(ctx, metadata.MD(map[string][]string{
-		"authorization": []string{"bearer " + idToken}}))
+		"authorization": {"bearer " + idToken}}))
 
 	t.Run("Authenticate", func(t *testing.T) {
 

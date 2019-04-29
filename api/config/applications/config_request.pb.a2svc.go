@@ -54,11 +54,11 @@ func (m *ConfigRequest) BindPort(name string, value uint16) error {
 
 // ListPorts lists all the ports exposed by the config
 func (m *ConfigRequest) ListPorts() []a2conf.PortInfo {
-	return []a2conf.PortInfo{a2conf.PortInfo{
+	return []a2conf.PortInfo{{
 		Default:  uint16(int32(10133)),
 		Name:     "service",
 		Protocol: "grpc",
-	}, a2conf.PortInfo{
+	}, {
 		Default:  uint16(int32(20133)),
 		Name:     "prometheus",
 		Protocol: "http",

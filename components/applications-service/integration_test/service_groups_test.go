@@ -31,7 +31,7 @@ func TestServiceGroupsHealthOneOk(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -64,7 +64,7 @@ func TestServiceGroupsHealthOneCritical(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
@@ -96,7 +96,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "myapp.default",
 					Release:          "core/myapp/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
@@ -107,7 +107,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Warning: 1,
 					},
 				},
-				&applications.ServiceGroup{
+				{
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
@@ -119,7 +119,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Unknown:  1,
 					},
 				},
-				&applications.ServiceGroup{
+				{
 					Name:             "redis.default",
 					Release:          "core/redis/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
@@ -129,7 +129,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Ok:    3,
 					},
 				},
-				&applications.ServiceGroup{
+				{
 					Name:             "test.default",
 					Release:          "core/test/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
@@ -158,7 +158,7 @@ func TestServiceGroupsHealthOneWarning(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -191,7 +191,7 @@ func TestServiceGroupsHealthOneUnknown(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -223,7 +223,7 @@ func TestServiceGroupsHealthOneEach(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",

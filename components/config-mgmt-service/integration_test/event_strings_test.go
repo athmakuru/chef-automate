@@ -64,13 +64,13 @@ func TestEventStringsIncorrectHoursBetween(t *testing.T) {
 func TestEventStringsIncorrectTimezone(t *testing.T) {
 	var ctx = context.Background()
 	cases := []request.EventStrings{
-		request.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
 			Timezone:     "",
 		},
-		request.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
@@ -92,68 +92,68 @@ func TestEventStringsIncorrectTimezone(t *testing.T) {
 func TestEventStringsIncorrectTimes(t *testing.T) {
 	var ctx = context.Background()
 	cases := []request.EventStrings{
-		request.EventStrings{
+		{
 			Start:        "2018-01-06",
 			End:          "2018-01-01",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "2000-00-00",
 			End:          "2000-00-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "00-00-00",
 			End:          "00-00-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "18-10-10",
 			End:          "18-10-16",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "20-01-01",
 			End:          "20-01-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "17:01:01",
 			End:          "17:01:06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "01-01-2000",
 			End:          "06-01-2000",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "3000-12",
 			End:          "3006-12",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
 
-		request.EventStrings{
+		{
 			Start:        "2019",
 			End:          "2018",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "1888:01:01",
 			End:          "1888:01:06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "2027/01/01",
 			End:          "2027/01/08",
 			HoursBetween: 3,
@@ -341,7 +341,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 									"Number of '%s' on string was %v should be %v", key, value, expectedValue)
 							}
 
-							for key, _ := range itemsCount {
+							for key := range itemsCount {
 								if key != "" {
 									_, ok := test.expected[key]
 									assert.True(t, ok, "Event type '%s' should not be on the string", key)
@@ -576,21 +576,21 @@ func testEventStringsThreeDayThreeActionsRequest(t *testing.T, date time.Time) {
 	action3Time := endDate
 
 	actions := []iBackend.InternalChefAction{
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action3Time,
 			EntityName: "action_3",
 			EntityType: "item",
 			Task:       "delete",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action2Time,
 			EntityName: "action_2",
 			EntityType: "cookbook",
 			Task:       "update",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action1Time,
 			EntityName: "action_1",
@@ -696,21 +696,21 @@ func testEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T, date tim
 	action3Time := endDate
 
 	actions := []iBackend.InternalChefAction{
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action3Time,
 			EntityName: "action_3",
 			EntityType: "item",
 			Task:       "delete",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action2Time,
 			EntityName: "action_2",
 			EntityType: "cookbook",
 			Task:       "update",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action1Time,
 			EntityName: "action_1",
@@ -895,48 +895,48 @@ func testEventStringsMultipleEventTypesAndCounts(t *testing.T, date time.Time) {
 
 	actions := []iBackend.InternalChefAction{
 		// Delete - Five different Events
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item1", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item2", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item3", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item4", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item5", Task: "delete"},
 		// Update - Five Events same type (Count)
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
 		// Create - (Mix) Two different Events twice each
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "bag", Task: "create"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "bag", Task: "create"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "role", Task: "create"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "role", Task: "create"},
 	}

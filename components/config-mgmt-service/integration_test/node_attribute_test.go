@@ -43,7 +43,7 @@ func TestNodeAttributeWhenNoNodeFoundReturnsError(t *testing.T) {
 
 func TestNodeAttributeWithOneNodeAttribute(t *testing.T) {
 	nodesAttribute := []iBackend.NodeAttribute{
-		iBackend.NodeAttribute{
+		{
 			EntityUUID:        "MOCK-UUID",
 			Name:              "test-node",
 			RunList:           []string{"recipe[the_cookbook::a_recipe]"},
@@ -159,7 +159,7 @@ func TestNodeAttributeWithTableDriven(t *testing.T) {
 
 	// Testing all the requests/responses
 	index = 0
-	for name, _ := range tests {
+	for name := range tests {
 		t.Run(name, func(t *testing.T) {
 			res, err := cfgmgmt.GetAttributes(ctx, &requests[index])
 			assert.Nil(t, err)

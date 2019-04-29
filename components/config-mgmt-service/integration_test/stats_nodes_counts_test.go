@@ -49,7 +49,7 @@ func TestStatsNodesCountsWithTwoNodes(t *testing.T) {
 	//
 	// Generate the objects you want to ingest
 	nodes := []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "success",
@@ -59,7 +59,7 @@ func TestStatsNodesCountsWithTwoNodes(t *testing.T) {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "missing",

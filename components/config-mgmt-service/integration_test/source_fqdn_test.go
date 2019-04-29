@@ -30,7 +30,7 @@ func TestSourceFqdnsEmpty(t *testing.T) {
 
 func TestSourceFqdnsWithTwoNodes(t *testing.T) {
 	nodes := []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid: newUUID(),
 				Status:     "missing",
@@ -38,7 +38,7 @@ func TestSourceFqdnsWithTwoNodes(t *testing.T) {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid: newUUID(),
 				Status:     "success",
@@ -55,10 +55,10 @@ func TestSourceFqdnsWithTwoNodes(t *testing.T) {
 	req := new(request.SourceFQDNS)
 	expected := &gpStruct.ListValue{
 		Values: []*gpStruct.Value{
-			&gpStruct.Value{
+			{
 				Kind: &gpStruct.Value_StringValue{"chef-server.example.com"},
 			},
-			&gpStruct.Value{
+			{
 				Kind: &gpStruct.Value_StringValue{"chef-solo.local"},
 			},
 		},

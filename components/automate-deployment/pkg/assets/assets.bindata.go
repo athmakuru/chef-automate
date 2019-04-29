@@ -339,19 +339,19 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"data": &bintree{nil, map[string]*bintree{
-		"a1_elasticsearch_mappings": &bintree{nil, map[string]*bintree{
-			"compliance-template.json": &bintree{dataA1_elasticsearch_mappingsComplianceTemplateJson, map[string]*bintree{}},
-			"insights-template.json":   &bintree{dataA1_elasticsearch_mappingsInsightsTemplateJson, map[string]*bintree{}},
+	"data": {nil, map[string]*bintree{
+		"a1_elasticsearch_mappings": {nil, map[string]*bintree{
+			"compliance-template.json": {dataA1_elasticsearch_mappingsComplianceTemplateJson, map[string]*bintree{}},
+			"insights-template.json":   {dataA1_elasticsearch_mappingsInsightsTemplateJson, map[string]*bintree{}},
 		}},
-		"a1stub_certs": &bintree{nil, map[string]*bintree{
-			"ChefAutomateUpgradeFromv1SelfTest.crl": &bintree{dataA1stub_certsChefautomateupgradefromv1selftestCrl, map[string]*bintree{}},
-			"ChefAutomateUpgradeFromv1SelfTest.crt": &bintree{dataA1stub_certsChefautomateupgradefromv1selftestCrt, map[string]*bintree{}},
-			"ChefAutomateUpgradeFromv1SelfTest.key": &bintree{dataA1stub_certsChefautomateupgradefromv1selftestKey, map[string]*bintree{}},
+		"a1stub_certs": {nil, map[string]*bintree{
+			"ChefAutomateUpgradeFromv1SelfTest.crl": {dataA1stub_certsChefautomateupgradefromv1selftestCrl, map[string]*bintree{}},
+			"ChefAutomateUpgradeFromv1SelfTest.crt": {dataA1stub_certsChefautomateupgradefromv1selftestCrt, map[string]*bintree{}},
+			"ChefAutomateUpgradeFromv1SelfTest.key": {dataA1stub_certsChefautomateupgradefromv1selftestKey, map[string]*bintree{}},
 		}},
-		"binds.txt":        &bintree{dataBindsTxt, map[string]*bintree{}},
-		"init-config.toml": &bintree{dataInitConfigToml, map[string]*bintree{}},
-		"services.json":    &bintree{dataServicesJson, map[string]*bintree{}},
+		"binds.txt":        {dataBindsTxt, map[string]*bintree{}},
+		"init-config.toml": {dataInitConfigToml, map[string]*bintree{}},
+		"services.json":    {dataServicesJson, map[string]*bintree{}},
 	}},
 }}
 

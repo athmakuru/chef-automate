@@ -31,7 +31,7 @@ func TestOrganizationsEmpty(t *testing.T) {
 
 func TestOrganizationsWithTwoNodes(t *testing.T) {
 	nodes := []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "missing",
@@ -39,7 +39,7 @@ func TestOrganizationsWithTwoNodes(t *testing.T) {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "success",
@@ -56,8 +56,8 @@ func TestOrganizationsWithTwoNodes(t *testing.T) {
 	req := new(request.Organizations)
 	expected := &gpStruct.ListValue{
 		Values: []*gpStruct.Value{
-			&gpStruct.Value{Kind: &gpStruct.Value_StringValue{"awesome_org"}},
-			&gpStruct.Value{Kind: &gpStruct.Value_StringValue{"cool_org"}},
+			{Kind: &gpStruct.Value_StringValue{"awesome_org"}},
+			{Kind: &gpStruct.Value_StringValue{"cool_org"}},
 		},
 	}
 

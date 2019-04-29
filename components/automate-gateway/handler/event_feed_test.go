@@ -196,20 +196,20 @@ func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 	functionCalled := false
 
 	collection := []*cmsRes.EventCollection{
-		&cmsRes.EventCollection{
+		{
 			EventsCount: []*cmsRes.EventCount{
-				&cmsRes.EventCount{Name: "a"},
+				{Name: "a"},
 			},
 		},
-		&cmsRes.EventCollection{
+		{
 			EventsCount: []*cmsRes.EventCount{
-				&cmsRes.EventCount{Name: "b"},
+				{Name: "b"},
 			},
 		},
 	}
 
 	var cmsStringSlice = []*cmsRes.EventString{
-		&cmsRes.EventString{
+		{
 			Collection:  collection,
 			EventAction: "create",
 		},
@@ -229,7 +229,7 @@ func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 	})
 
 	var feedActionLine = []*complFeed.ActionLine{
-		&complFeed.ActionLine{
+		{
 			Slots:  make([]*complFeed.Timeslot, 2),
 			Action: "create",
 		},
@@ -260,14 +260,14 @@ func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 	expectedEventString := []*agRes.EventString{}
 	agInsides := &agRes.EventString{
 		Collection: []*agRes.EventCollection{
-			&agRes.EventCollection{
+			{
 				EventsCount: []*agRes.EventCount{
-					&agRes.EventCount{Name: "a"},
+					{Name: "a"},
 				},
 			},
-			&agRes.EventCollection{
+			{
 				EventsCount: []*agRes.EventCount{
-					&agRes.EventCount{Name: "b"},
+					{Name: "b"},
 				},
 			},
 		},

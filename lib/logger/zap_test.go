@@ -19,12 +19,12 @@ func TestGRPCLogCompatZap(t *testing.T) {
 	levelsWeCareAbout := []string{"debug", "info", "warn", "error"}
 	outputInLoggerLevel := [...]map[string]bool{
 		// 0 is always output
-		map[string]bool{"debug": true, "info": true, "warn": true, "error": true},
+		{"debug": true, "info": true, "warn": true, "error": true},
 		// 1 is always output
-		map[string]bool{"debug": true, "info": true, "warn": true, "error": true},
+		{"debug": true, "info": true, "warn": true, "error": true},
 		// 2 and 3 are only output for debug
-		map[string]bool{"debug": true},
-		map[string]bool{"debug": true},
+		{"debug": true},
+		{"debug": true},
 	}
 	// grpc verbosity levels
 	for lvl := 0; lvl <= 3; lvl++ {

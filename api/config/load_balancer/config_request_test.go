@@ -24,7 +24,7 @@ func TestValidateConfigRequestMissingFrontendTLS(t *testing.T) {
 	c := NewConfigRequest()
 	c.V1.Sys.Service.ExternalFqdn = w.String("fqdn")
 	c.V1.Sys.FrontendTls = []*shared.FrontendTLSCredential{
-		&shared.FrontendTLSCredential{
+		{
 			ServerName: "foo",
 			Key:        "foo",
 		},

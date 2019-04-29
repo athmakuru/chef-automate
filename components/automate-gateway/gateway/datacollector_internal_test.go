@@ -406,12 +406,12 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreObjects(t *testing.T) {
 	arrayStruct := getStructArray("data", bytes)
 
 	expectedDataField := []*structpb.Struct{
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
 				"id": {Kind: &structpb.Value_StringValue{"1"}},
 			},
 		},
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
 				"id": {Kind: &structpb.Value_StringValue{"2"}},
 			},
@@ -426,12 +426,12 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
 	arrayStruct := getStructArray("data", bytes)
 
 	expectedDataField := []*structpb.Struct{
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
 				"id": {Kind: &structpb.Value_StringValue{"1"}},
 			},
 		},
-		&structpb.Struct{
+		{
 			Fields: map[string]*structpb.Value{
 				"id": {Kind: &structpb.Value_StringValue{"2"}},
 			},

@@ -28,8 +28,8 @@ func init() {
 func (es Backend) GetNode(id string) (backend.Node, error) {
 	var node backend.Node
 	filters := map[string][]string{
-		"exists":      []string{"true"},
-		"entity_uuid": []string{id},
+		"exists":      {"true"},
+		"entity_uuid": {id},
 	}
 	filtersQuery := newBoolQueryFromFilters(filters)
 

@@ -61,7 +61,7 @@ func TestIntrospectAllV1(t *testing.T) {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "auth:policies", Action: "create"},
 			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
+			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
 		},
 		"two response pairs, both mapped": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
@@ -69,8 +69,8 @@ func TestIntrospectAllV1(t *testing.T) {
 				{Resource: "auth_introspection:introspect_all", Action: "read"},
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/introspect": &response.MethodsAllowed{Get: true},
-				"/auth/policies":   &response.MethodsAllowed{Post: true},
+				"/auth/introspect": {Get: true},
+				"/auth/policies":   {Post: true},
 			},
 		},
 		"two response pairs, both mapped, one with holes": {
@@ -126,7 +126,7 @@ func TestIntrospectAllV2(t *testing.T) {
 			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
 			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
+			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
 		},
 		"two response pairs, both mapped": {
 			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
@@ -134,8 +134,8 @@ func TestIntrospectAllV2(t *testing.T) {
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/introspect": &response.MethodsAllowed{Get: true},
-				"/auth/policies":   &response.MethodsAllowed{Post: true},
+				"/auth/introspect": {Get: true},
+				"/auth/policies":   {Post: true},
 			},
 		},
 		"two response pairs, both mapped, one with holes": {
@@ -332,7 +332,7 @@ func TestIntrospect(t *testing.T) {
 				{Resource: "auth:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "delete"},
 			}},
 			&request.IntrospectReq{Path: "/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
-			map[string]*response.MethodsAllowed{"/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
+			map[string]*response.MethodsAllowed{"/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": {Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
@@ -341,14 +341,14 @@ func TestIntrospect(t *testing.T) {
 			&request.IntrospectReq{
 				Parameters: []string{"entity_uuid=f33a996c-b4e8-4328-9730-90f4b351fa6e"},
 				Path:       "/ingest/events/chef/run"},
-			map[string]*response.MethodsAllowed{"/ingest/events/chef/run": &response.MethodsAllowed{Post: true}},
+			map[string]*response.MethodsAllowed{"/ingest/events/chef/run": {Post: true}},
 		},
 		"response pair matching the request with multiple params in path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "cfgmgmt:nodes:42:runs:509", Action: "read"},
 			}},
 			&request.IntrospectReq{Path: "/cfgmgmt/nodes/42/runs/509"},
-			map[string]*response.MethodsAllowed{"/cfgmgmt/nodes/42/runs/509": &response.MethodsAllowed{Get: true}},
+			map[string]*response.MethodsAllowed{"/cfgmgmt/nodes/42/runs/509": {Get: true}},
 		},
 		// TODO: AUTH-1337 Either: enable this test case after providing support
 		// or remove test case if decide not to support it
