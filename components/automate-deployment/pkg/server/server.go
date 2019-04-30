@@ -1457,7 +1457,8 @@ func (s *server) shutItAllDown() error {
 	defer s.deployment.Unlock()
 
 	logger := newConvergeLoopLogger()
-	if err := s.converger.StopServices(taskStop, s.target(), logger); err != nil {
+	err = s.converger.PrepareForShutdown(taskStop, s.target(), logger)
+	if err != nil && err != api.ErrRestartPending {
 		return err
 	}
 

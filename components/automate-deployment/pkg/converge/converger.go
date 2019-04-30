@@ -32,6 +32,7 @@ var (
 type Converger interface {
 	Converge(*Task, DesiredState, EventSink) error
 	StopServices(*Task, target.Target, EventSink) error
+	PrepareForShutdown(*Task, target.Target, EventSink) error
 
 	// TODO(ssd) 2019-04-21: This is a bit odd. It is necessary
 	// for the moment because the actual deployment-service
@@ -254,18 +255,33 @@ func (c *convergeRequest) String() string { return "convergeRequest" }
 
 // stopRequest is a user-sendable message that instructs the
 // converger to stop all services.
-type stopRequest struct {
+type stopServicesRequest struct {
 	eventSink    EventSink
 	desiredState DesiredState
 	doneChan     chan error
 }
 
-func (s *stopRequest) SendResponse(err error) {
+func (s *stopServicesRequest) SendResponse(err error) {
 	s.doneChan <- err
 	close(s.doneChan)
 }
 
-func (s *stopRequest) String() string { return "stopRequest" }
+func (s *stopServicesRequest) String() string { return "stopServicesRequest" }
+
+// prepareForShutdown is a user-sendable message that instructs the
+// converger to stop all services and wait for a shutdown
+type prepareForShutdownRequest struct {
+	eventSink    EventSink
+	desiredState DesiredState
+	doneChan     chan error
+}
+
+func (s *prepareForShutdownRequest) SendResponse(err error) {
+	s.doneChan <- err
+	close(s.doneChan)
+}
+
+func (s *prepareForShutdownRequest) String() string { return "prepareForShutdown" }
 
 // reconfigureDone is a user-sendable message that instructs the
 // converger that we've completed a reconfiguration request.
@@ -287,13 +303,13 @@ func (r *reconfigureDone) String() string { return "reconfigureDone" }
 // We use the following state machine to handle the two "waiting"
 // states that we need to track inside the converger.
 //
-//        +-----------+  convergeRequest           +-------------------+
-//        |           |  err = ErrRestartPending   |                   |
-//        |           +--------------------------->|                   |
-//        |    idle   |                            | waitingForRestart |
-//        |           |<---------------------------+                   |
-//        |           |       timeout              |                   |
-//        +-------+---+                            +-------------------+
+//        +-----------+  convergeRequest| prepareForShutdown  +-------------------+
+//        |           |  err = ErrRestartPending              |                   |
+//        |           +-------------------------------------->|                   |
+//        |    idle   |                                       | waitingForRestart |
+//        |           |<--------------------------------------+                   |
+//        |           |       timeout                         |                   |
+//        +-------+---+                                       +-------------------+
 //            ^   |
 //            |   | convergeRequest
 //   timeout 2|   | err = ErrSelfReconfigurePending
@@ -324,15 +340,17 @@ func (i *idle) ProcessMessage(c *converger, msg message) (state, bool, error) {
 		}
 		err = convergePlan.Execute(req.eventSink)
 		return i.handleError(err)
-	case *stopRequest:
-		req := msg.(*stopRequest)
-		convergePlan, err := c.compiler.Compile(req.desiredState)
-		if err != nil {
-			logrus.WithError(err).Error("Failed to compile")
-			return i, false, err
-		}
-		err = convergePlan.Execute(req.eventSink)
+	case *stopServicesRequest:
+		req := msg.(*stopServicesRequest)
+		err := doStopServices(c.compiler, req.desiredState, req.eventSink)
 		return i.handleError(err)
+	case *prepareForShutdownRequest:
+		req := msg.(*prepareForShutdownRequest)
+		err := doStopServices(c.compiler, req.desiredState, req.eventSink)
+		if err != nil {
+			return i.handleError(err)
+		}
+		return newWaitingForRestart(), false, nil
 	case *reconfigureDone:
 		logrus.Warn("received reconfigureDone when in idle state. We should have been in waitingForReconfigure")
 		return i, false, nil
@@ -342,6 +360,15 @@ func (i *idle) ProcessMessage(c *converger, msg message) (state, bool, error) {
 	default:
 		return i, false, UnknownMessageError(msg, i)
 	}
+}
+
+func doStopServices(c Compiler, state DesiredState, sink EventSink) error {
+	convergePlan, err := c.Compile(state)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to compile")
+		return errors.Wrap(err, "failed to compile")
+	}
+	return convergePlan.Execute(sink)
 }
 
 func (i *idle) handleError(err error) (state, bool, error) {
@@ -380,7 +407,7 @@ func (w *waitingForRestart) ProcessMessage(_ *converger, msg message) (state, bo
 	case *timeout:
 		logrus.Info("timed out waiting for restart, re-entering idle state")
 		return &idle{}, true, nil
-	case *stopRequest, *convergeRequest:
+	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest:
 		logrus.Infof("ignoring message %v because we are waiting to be restarted", msg)
 		return w, false, api.ErrRestartPending
 	case *reconfigureDone:
@@ -423,7 +450,7 @@ func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state
 		return &idle{}, true, nil
 	case *reconfigureDone:
 		return &idle{}, true, nil
-	case *stopRequest, *convergeRequest:
+	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest:
 		logrus.Infof("ignoring message %v because we are waiting to be reconfigured", msg)
 		return w, false, api.ErrSelfReconfigurePending
 	default:
@@ -482,6 +509,24 @@ func (converger *converger) Converge(task *Task, desiredState DesiredState, even
 // StopServices requests that the converger tries to stop all
 // non-deployment services on the given target.
 func (converger *converger) StopServices(t *Task, tgt target.Target, eventSink EventSink) error {
+	return converger.sendMessage(t, &stopServicesRequest{
+		eventSink:    eventSink,
+		desiredState: makeStoppedDesiredState(tgt), //TODO(jaym) make a copy
+		doneChan:     t.C,
+	})
+}
+
+// PrepareForShutdown gets the system ready to shutdown. It stops all
+// services and moves the converger into waitingForRestart()
+func (converger *converger) PrepareForShutdown(t *Task, tgt target.Target, eventSink EventSink) error {
+	return converger.sendMessage(t, &prepareForShutdownRequest{
+		eventSink:    eventSink,
+		desiredState: makeStoppedDesiredState(tgt), //TODO(jaym) make a copy
+		doneChan:     t.C,
+	})
+}
+
+func makeStoppedDesiredState(tgt target.Target) DesiredState {
 	topology := make(Topology)
 	topology[tgt] = []Service{
 		{
@@ -489,16 +534,10 @@ func (converger *converger) StopServices(t *Task, tgt target.Target, eventSink E
 			ConvergeState: Skip(),
 		},
 	}
-	desiredState := NewDesiredState(topology,
+	return NewDesiredState(topology,
 		NewSkipSupervisorState(),
 		[]habpkg.HabPkg{}, // ignore-list is empty because cleanup mode is disabled
 		depot.DisabledGC)
-
-	return converger.sendMessage(t, &stopRequest{
-		eventSink:    eventSink,
-		desiredState: desiredState, //TODO(jaym) make a copy
-		doneChan:     t.C,
-	})
 }
 
 // Stop stops the converger
