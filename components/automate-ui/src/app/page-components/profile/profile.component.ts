@@ -45,8 +45,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.welcomeModalComponent.showModal();
   }
 
-  toggleDropdown(event) {
-    event.stopPropagation();
+  toggleDropdown() {
     this.dropdownVisible = !this.dropdownVisible;
   }
 
