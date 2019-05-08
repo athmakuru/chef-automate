@@ -57,9 +57,9 @@ def get_latest(channel, origin, name)
   # IF YOU UPDATE THESE PINS YOU MUST ALSO UPDATE THE core/hab PIN IN components/automate-deployment/habitat/plan.sh
   #
   pinned_hab_components = {
-    "hab"          => { "origin" => "core", "name" => "hab",          "version" => "0.69.0", "release" => "20181127182011"},
-    "hab-sup"      => { "origin" => "core", "name" => "hab-sup",      "version" => "0.69.0", "release" => "20181127183841"},
-    "hab-launcher" => { "origin" => "core", "name" => "hab-launcher", "version" => "9106",   "release" => "20181126205526"}
+    "hab"          => { "origin" => "core", "name" => "hab",          "version" => "0.81.0", "release" => "20190507225645"},
+    "hab-sup"      => { "origin" => "core", "name" => "hab-sup",      "version" => "0.81.0", "release" => "20190507232554"},
+    "hab-launcher" => { "origin" => "core", "name" => "hab-launcher", "version" => "11055",   "release" => "20190507223943"}
   }
 
   if pinned_databases.keys.include?(name)
