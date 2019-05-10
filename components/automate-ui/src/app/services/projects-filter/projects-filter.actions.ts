@@ -6,7 +6,9 @@ export enum ProjectsFilterActionTypes {
   LOAD_OPTIONS         = 'PROJECTS_FILTER::LOAD_OPTIONS',
   LOAD_OPTIONS_SUCCESS = 'PROJECTS_FILTER::LOAD_OPTIONS::SUCCESS',
   LOAD_OPTIONS_FAILURE = 'PROJECTS_FILTER::LOAD_OPTIONS::FAILURE',
-  SAVE_OPTIONS =         'PROJECTS_FILTER::SAVE_OPTIONS'
+  SAVE_OPTIONS         = 'PROJECTS_FILTER::SAVE_OPTIONS',
+  SAVE_OPTIONS_SUCCESS = 'PROJECTS_FILTER::SAVE_OPTIONS::SUCCESS',
+  SAVE_OPTIONS_FAILURE = 'PROJECTS_FILTER::SAVE_OPTIONS::FAILURE',
 }
 
 export class LoadOptions implements Action {
@@ -28,8 +30,20 @@ export class SaveOptions implements Action {
   constructor(public payload: ProjectsFilterOption[]) { }
 }
 
+export class SaveOptionsSuccess implements Action {
+  readonly type = ProjectsFilterActionTypes.SAVE_OPTIONS_SUCCESS;
+  constructor(public payload: ProjectsFilterOption[]) { }
+}
+
+export class SaveOptionsFailure implements Action {
+  readonly type = ProjectsFilterActionTypes.SAVE_OPTIONS_FAILURE;
+  constructor(public payload: Error) { }
+}
+
 export type ProjectsFilterActions =
   | LoadOptions
   | LoadOptionsSuccess
   | LoadOptionsFailure
-  | SaveOptions;
+  | SaveOptions
+  | SaveOptionsSuccess
+  | SaveOptionsFailure;

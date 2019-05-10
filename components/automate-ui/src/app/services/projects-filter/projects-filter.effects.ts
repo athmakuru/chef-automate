@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of as observableOf } from 'rxjs';
 import { switchMap, catchError, map, tap } from 'rxjs/operators';
@@ -10,14 +11,17 @@ import {
   LoadOptions,
   LoadOptionsSuccess,
   LoadOptionsFailure,
-  SaveOptions
+  SaveOptions,
+  SaveOptionsSuccess,
+  SaveOptionsFailure
 } from './projects-filter.actions';
 
 @Injectable()
 export class ProjectsFilterEffects {
   constructor(
     private actions$: Actions,
-    private projectsFilter: ProjectsFilterService
+    private projectsFilter: ProjectsFilterService,
+    private router: Router
   ) { }
 
   @Effect()
@@ -35,9 +39,34 @@ export class ProjectsFilterEffects {
         catchError((error: HttpErrorResponse) => observableOf(new LoadOptionsFailure(error))));
     }));
 
-  @Effect({ dispatch: false })
+  @Effect()
   saveOptions$ = this.actions$.pipe(
     ofType<SaveOptions>(ProjectsFilterActionTypes.SAVE_OPTIONS),
-    tap(({ payload }) => this.projectsFilter.storeOptions(payload))
+    map(({ payload }) => {
+      try {
+        this.projectsFilter.storeOptions(payload);
+        return new SaveOptionsSuccess(payload);
+      } catch (error) {
+        return new SaveOptionsFailure(error);
+      }
+    }));
+
+  @Effect({ dispatch: false })
+  saveOptionsSuccess$ = this.actions$.pipe(
+    ofType<SaveOptionsSuccess>(ProjectsFilterActionTypes.SAVE_OPTIONS_SUCCESS),
+    // tap(() => location.reload())
+    tap(() => {
+      // super hack for avoiding a full location.reload()
+      const reloadUrl = '/reload';
+      const currentUrl = location.pathname + location.search;
+      this.router.navigateByUrl(reloadUrl, { skipLocationChange: true })
+        .then(() => this.router.navigateByUrl(currentUrl, { skipLocationChange: true }));
+    })
+  );
+
+  @Effect({ dispatch: false })
+  saveOptionsFailure$ = this.actions$.pipe(
+    ofType<SaveOptionsFailure>(ProjectsFilterActionTypes.SAVE_OPTIONS_FAILURE),
+    tap(({ payload }) => console.error('Something bad happened: ', payload))
   );
 }

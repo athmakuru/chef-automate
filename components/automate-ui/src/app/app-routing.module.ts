@@ -297,6 +297,10 @@ const routes: Routes = [
     pathMatch: 'prefix',
     redirectTo: 'settings/node-credentials'
   },
+  {
+    path: 'reload',
+    children: []
+  },
   // END Deprecated routes.
   { // everything unknown goes to client runs
     path: '**',
