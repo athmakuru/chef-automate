@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -27,8 +29,87 @@ type assetNotification struct {
 }
 
 type attributesMessage struct {
-	Automatic string               `json:"automatic"`
+	//Automatic attributes               `json:"automatic"`
+	Automatic map[string]interface{} 	`json:"automatic"`
 	LastRun   *cfgmgmtResponse.Run `json:"last_run"`
+}
+
+
+type chef struct {
+	ChefRoot string `json:"chef_root"`
+	Version string `json:"version"`
+}
+
+type ohai struct {
+	OhaiRoot string `json:"ohai_root"`
+	Version string `json:"version"`
+}
+
+type ChefPackages struct {
+	Chef chef `json:"chef"`
+	Ohai ohai `json:"ohai"`
+}
+
+type attributes struct {
+	ChefEnvironment string `json:"chef_environment"`
+	ChefGuid string `json:"chef_guid"`
+	//ChefPackages ChefPackages `json:"chef_packages"`
+	// Cloud
+	// Command
+	// Cookbooks
+	Cookbooks map[string]interface{} `json:"cookbooks"`
+	// Counters
+	// Cpu
+	CurrentUser string `json:"current_user"`
+	// Dmi
+	Domain string `json:"domain"`
+	// cloud provider e.g. ec2
+	// etc - possibly linux only
+	// Expanded run list
+	// filesystem - differs by os, what is common?
+	// fips
+	Fqdn string `json:"fqdn"`
+	Hostname string `json:"hostname"`
+	IpAddress string `json:"ipaddress"`
+	Ip6Address string `json:"ip6address"`
+	// json?
+	// kernel differs by os
+	// keys
+	// languages format differ by os
+	MacAddress string `json:"macaddress"`
+	MachineId string `json:"machine_id"`
+	MachineName string `json:"machinename"`
+	// memory differes by os version
+	Name string `json:"name"`
+	// Network differs by os
+	// nginx? if present would we bother?
+	OhaiTime float64 `json:"ohai_time"`
+	Os string `json:"os"`
+	OsVersion string `json:"os_version"`
+	// packages
+	Platform string `json:"platform"`
+	PlatformFamily string `json:"platform_family"`
+	PlatformVersion string `json:"platform_version"`
+	// recipes
+	// roles
+	RootGroup string `json:"root_group"`
+	ShardSeed float64 `json:"shard_seed"`
+	// tags
+	// time
+	Uptime string `json:"uptime"`
+	UptimeSeconds float64 `json:"uptime_seconds"`
+	// virtualization
+
+	// known os specifics
+	// Ubuntu
+	// shells
+	// site
+	// sysconf
+	// sytemd_paths
+
+	// windows
+	// system_enclosure
+
 }
 
 type serviceClients struct {
@@ -255,6 +336,7 @@ func buildDatafeed(serviceClients *serviceClients, dataFeedConfig *config.DataFe
 			// continue to the next node
 			continue
 		}
+		attributesJson := buildDynamicJson(automaticJson)
 		ohaiTime := automaticJson["ohai_time"].(float64)
 		log.Debugf("feedStartTime %v, feedEndTime %v, ohai_time %v", feedStart, feedEnd, ohaiTime)
 		if ohaiTime > feedStart && ohaiTime < feedEnd {
@@ -267,11 +349,102 @@ func buildDatafeed(serviceClients *serviceClients, dataFeedConfig *config.DataFe
 				log.Debugf("Last run\n %v", lastRun)
 			}
 
-			message := attributesMessage{Automatic: nodeAttributes.Automatic, LastRun: lastRun}
+			message := attributesMessage{Automatic: attributesJson, LastRun: lastRun}
 			log.Debugf("Message: %v", message)
 			messages = append(messages, message)
 		}
 	}
 	log.Debugf("%v node attribute messages retrieved in interval", len(messages))
 	return messages
+}
+
+func buildAttributesJson(automaticJson map[string]interface{}) attributes {
+
+	attributesJson := attributes{
+		ChefEnvironment: automaticJson["chef_environment"].(string),
+		ChefGuid: automaticJson["chef_guid"].(string),
+		Cookbooks: automaticJson["cookbooks"].(map[string]interface{}),
+		//ChefPackages: automaticJson["chef_packages"],
+		CurrentUser: getSafeString(automaticJson, "current_user"),
+		Domain: getSafeString(automaticJson, "domain"),
+		Fqdn: automaticJson["fqdn"].(string),
+		Hostname: automaticJson["hostname"].(string),
+		IpAddress: automaticJson["ipaddress"].(string),
+		Ip6Address: automaticJson["ip6address"].(string),
+		MacAddress: automaticJson["macaddress"].(string),
+		MachineId: getSafeString(automaticJson, "machine_id"),
+		MachineName: automaticJson["machinename"].(string),
+		Name: automaticJson["name"].(string),
+		OhaiTime: automaticJson["ohai_time"].(float64),
+		Os: automaticJson["os"].(string),
+		OsVersion: automaticJson["os_version"].(string),
+		Platform: automaticJson["platform"].(string),
+		PlatformFamily: automaticJson["platform_family"].(string),
+		PlatformVersion: automaticJson["platform_version"].(string),
+		RootGroup: automaticJson["root_group"].(string),
+		ShardSeed: automaticJson["shard_seed"].(float64),
+		Uptime: automaticJson["uptime"].(string),
+		UptimeSeconds: automaticJson["uptime_seconds"].(float64)}
+
+	return attributesJson
+}
+
+func buildDynamicJson(automaticJson map[string]interface{}) map[string]interface{} {
+	// check what format he json is e.g. ubuntu/ windows
+	// remove specific sections
+	// insert normalised
+	var dynamicJson map[string]interface{}
+	if automaticJson["lsb"] != nil {
+		dynamicJson = buildUbuntuJson(automaticJson)
+	} else if automaticJson["os"] == "windows" {
+		dynamicJson = buildWindowsJson(automaticJson)
+	}
+
+	return dynamicJson
+}
+
+
+func buildUbuntuJson(ubuntuJson map[string]interface{}) map[string]interface{} {
+	// check what format he json is e.g. ubuntu/ windows
+	// remove specific sections
+	// insert normalised
+
+	lsb := ubuntuJson["lsb"].(map[string]interface{})
+	ubuntuJson["description"] = lsb["description"]
+
+	dmi := ubuntuJson["dmi"].(map[string]interface{})
+	system := dmi["system"].(map[string]interface{})
+	ubuntuJson["serial_number"] = system["serial_number"]
+
+	//delete(ubuntuJson, "lsb")
+	//delete(ubuntuJson, "system")
+
+	return ubuntuJson
+}
+
+
+func buildWindowsJson(windowsJson map[string]interface{}) map[string]interface{} {
+	// check what format he json is e.g. ubuntu/ windows
+	// remove specific sections
+	// insert normalised
+
+	kernel := windowsJson["kernel"].(map[string]interface{})
+	windowsJson["description"] = kernel["name"]
+	osInfo := kernel["os_info"].(map[string]interface{})
+	windowsJson["serial_number"] = osInfo["serial_number"]
+	servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
+	servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
+	servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
+	windowsJson["os_service_pack"] = servicePack
+
+	//delete(windowsJson, "kernel")
+
+	return windowsJson
+}
+
+func getSafeString(automaticJson map[string]interface{}, s string) string {
+	if automaticJson[s] == nil {
+		return ""
+	}
+	return automaticJson[s].(string)
 }
