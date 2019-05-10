@@ -10,6 +10,7 @@ export class ProjectConstants {
   static readonly UNASSIGNED_PROJECT_ID = '(unassigned)';
   static readonly UNASSIGNED_PROJECT_LABEL = 'Unassigned resources';
   static readonly ALL_RESOURCES_LABEL = 'All resources';
+  static readonly ALL_RESOURCES_VALUE = '*';
   static readonly ALL_PROJECTS_LABEL = 'All projects';
   static readonly MULTIPLE_PROJECTS_LABEL = 'Multiple projects';
 }

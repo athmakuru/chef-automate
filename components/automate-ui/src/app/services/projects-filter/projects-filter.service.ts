@@ -15,6 +15,8 @@ export class ProjectsFilterService {
 
   selectionLabel$ = this.store.select(selectors.selectionLabel);
 
+  selectionValue$ = this.store.select(selectors.selectionValue);
+
   selectionCount$ = this.store.select(selectors.selectionCount);
 
   selectionCountVisible$ = this.store.select(selectors.selectionCountVisible);
@@ -60,7 +62,7 @@ export class ProjectsFilterService {
         checked: false
       },
       {
-        value: 'ze end of the alpha project',
+        value: 'ze-end-of-the-alpha-project',
         label: 'ZETA PROJ',
         checked: false
       },

@@ -9,6 +9,8 @@ export const optionsLoadingStatus = createSelector(projectsFilterState,
 
 export const selectionLabel = createSelector(projectsFilterState, state => state.selectionLabel);
 
+export const selectionValue = createSelector(projectsFilterState, state => state.selectionValue);
+
 export const selectionCount = createSelector(projectsFilterState, state => state.selectionCount);
 
 export const selectionCountVisible = createSelector(projectsFilterState,

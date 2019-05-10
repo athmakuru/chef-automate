@@ -9,6 +9,7 @@ import {
 
 const {
   UNASSIGNED_PROJECT_ID,
+  ALL_RESOURCES_VALUE,
   ALL_RESOURCES_LABEL,
   ALL_PROJECTS_LABEL,
   MULTIPLE_PROJECTS_LABEL
@@ -29,6 +30,7 @@ export interface ProjectsFilterState {
   options: ProjectsFilterOption[];
   optionsLoadingStatus: EntityStatus;
   selectionLabel: string;
+  selectionValue: string;
   selectionCount: number;
   selectionCountVisible: boolean;
   selectionCountActive: boolean;
@@ -39,6 +41,7 @@ export const projectsFilterInitialState: ProjectsFilterState = {
   options: [],
   optionsLoadingStatus: EntityStatus.notLoaded,
   selectionLabel: ALL_RESOURCES_LABEL,
+  selectionValue: ALL_RESOURCES_VALUE,
   selectionCount: 0,
   selectionCountVisible: false,
   selectionCountActive: false,
@@ -62,6 +65,7 @@ export function projectsFilterReducer(
         set('options', sortedOptions),
         set('optionsLoadingStatus', EntityStatus.loadingSuccess),
         set('selectionLabel', selectionLabel(sortedOptions)),
+        set('selectionValue', selectionValue(sortedOptions)),
         set('selectionCount', selectionCount(sortedOptions)),
         set('selectionCountVisible', selectionCountVisible(sortedOptions)),
         set('selectionCountActive', selectionCountActive(sortedOptions)),
@@ -77,6 +81,7 @@ export function projectsFilterReducer(
       return pipe(
         set('options', action.payload),
         set('selectionLabel', selectionLabel(action.payload)),
+        set('selectionValue', selectionValue(action.payload)),
         set('selectionCount', selectionCount(action.payload)),
         set('selectionCountVisible', selectionCountVisible(action.payload)),
         set('selectionCountActive', selectionCountActive(action.payload)),
@@ -123,6 +128,11 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   }
 
   return ALL_PROJECTS_LABEL;
+}
+
+function selectionValue(options: ProjectsFilterOption[]): string {
+  const checkedValues = options.filter(o => o.checked).map(o => o.value);
+  return checkedValues.length > 0 ? checkedValues.join(',') : ALL_RESOURCES_VALUE;
 }
 
 function selectionCount(options: ProjectsFilterOption[]): number {
