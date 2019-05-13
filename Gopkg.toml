@@ -202,13 +202,12 @@ required = [
   version = "19.1.0"
 
 # authz-service
-# Note 2018/12/11 (sr): We're explicitly pinning this version. Bumping OPA
+# Note 2019/05/13 (sr): We're explicitly pinning this revision. Bumping OPA
 # should be an explicit endeavour, and be accompanied by re-running the
-# benchmarks to assess the impact. (Version pins without "=" can be updated
-# more easily.)
+# benchmarks to assess the impact.
 [[constraint]]
   name = "github.com/open-policy-agent/opa"
-  version = "=0.10.7"
+  revision = "0ed56fef030cd8073937ac870dbef0d2fb59be58"
 
 [[constraint]]
   name = "github.com/chef/toml"
