@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/open-policy-agent/opa/metrics"
 	"github.com/open-policy-agent/opa/util"
 )
 
@@ -79,17 +80,26 @@ type Compiler struct {
 	moduleLoader ModuleLoader
 	ruleIndices  *util.HashMap
 	stages       []struct {
-		name string
-		f    func()
+		name       string
+		metricName string
+		f          func()
 	}
 	maxErrs    int
 	sorted     []string // list of sorted module names
 	pathExists func([]string) (bool, error)
-	after      map[string][]CompilerStage
+	after      map[string][]CompilerStageDefinition
+	metrics    metrics.Metrics
 }
 
 // CompilerStage defines the interface for stages in the compiler.
 type CompilerStage func(*Compiler) *Error
+
+// CompilerStageDefinition defines a compiler stage
+type CompilerStageDefinition struct {
+	Name       string
+	MetricName string
+	Stage      CompilerStage
+}
 
 // QueryContext contains contextual information for running an ad-hoc query.
 //
@@ -98,17 +108,11 @@ type CompilerStage func(*Compiler) *Error
 type QueryContext struct {
 	Package *Package
 	Imports []*Import
-	Input   Value
 }
 
 // NewQueryContext returns a new QueryContext object.
 func NewQueryContext() *QueryContext {
 	return &QueryContext{}
-}
-
-// InputDefined returns true if the input document is defined in qc.
-func (qc *QueryContext) InputDefined() bool {
-	return qc != nil && qc.Input != nil
 }
 
 // WithPackage sets the pkg on qc.
@@ -126,15 +130,6 @@ func (qc *QueryContext) WithImports(imports []*Import) *QueryContext {
 		qc = NewQueryContext()
 	}
 	qc.Imports = imports
-	return qc
-}
-
-// WithInput sets the input on qc.
-func (qc *QueryContext) WithInput(input Value) *QueryContext {
-	if qc == nil {
-		qc = NewQueryContext()
-	}
-	qc.Input = input
 	return qc
 }
 
@@ -171,7 +166,7 @@ type QueryCompiler interface {
 
 	// WithStageAfter registers a stage to run during query compilation after
 	// the named stage.
-	WithStageAfter(after string, stage QueryCompilerStage) QueryCompiler
+	WithStageAfter(after string, stage QueryCompilerStageDefinition) QueryCompiler
 
 	// RewrittenVars maps generated vars in the compiled query to vars from the
 	// parsed query. For example, given the query "input := 1" the rewritten
@@ -181,6 +176,15 @@ type QueryCompiler interface {
 
 // QueryCompilerStage defines the interface for stages in the query compiler.
 type QueryCompilerStage func(QueryCompiler, Body) (Body, error)
+
+// QueryCompilerStageDefinition defines a QueryCompiler stage
+type QueryCompilerStageDefinition struct {
+	Name       string
+	MetricName string
+	Stage      QueryCompilerStage
+}
+
+const compileStageMetricPrefex = "ast_compile_stage_"
 
 // NewCompiler returns a new empty compiler.
 func NewCompiler() *Compiler {
@@ -195,7 +199,7 @@ func NewCompiler() *Compiler {
 			return x.(Ref).Hash()
 		}),
 		maxErrs: CompileErrorLimitDefault,
-		after:   map[string][]CompilerStage{},
+		after:   map[string][]CompilerStageDefinition{},
 	}
 
 	c.ModuleTree = NewModuleTree(nil)
@@ -205,29 +209,30 @@ func NewCompiler() *Compiler {
 	c.TypeEnv = checker.checkLanguageBuiltins()
 
 	c.stages = []struct {
-		name string
-		f    func()
+		name       string
+		metricName string
+		f          func()
 	}{
 		// Reference resolution should run first as it may be used to lazily
 		// load additional modules. If any stages run before resolution, they
 		// need to be re-run after resolution.
-		{"ResolveRefs", c.resolveAllRefs},
-		{"RewriteAssignments", c.rewriteLocalAssignments},
-		{"RewriteExprTerms", c.rewriteExprTerms},
-		{"SetModuleTree", c.setModuleTree},
-		{"SetRuleTree", c.setRuleTree},
-		{"SetGraph", c.setGraph},
-		{"RewriteComprehensionTerms", c.rewriteComprehensionTerms},
-		{"RewriteRefsInHead", c.rewriteRefsInHead},
-		{"RewriteWithValues", c.rewriteWithModifiers},
-		{"CheckRuleConflicts", c.checkRuleConflicts},
-		{"CheckSafetyRuleHeads", c.checkSafetyRuleHeads},
-		{"CheckSafetyRuleBodies", c.checkSafetyRuleBodies},
-		{"RewriteEquals", c.rewriteEquals},
-		{"RewriteDynamicTerms", c.rewriteDynamicTerms},
-		{"CheckRecursion", c.checkRecursion},
-		{"CheckTypes", c.checkTypes},
-		{"BuildRuleIndices", c.buildRuleIndices},
+		{"ResolveRefs", "compile_stage_resolve_refs", c.resolveAllRefs},
+		{"RewriteAssignments", "compile_stage_rewrite_assignments", c.rewriteLocalAssignments},
+		{"RewriteExprTerms", "compile_stage_rewrite_expr_terms", c.rewriteExprTerms},
+		{"SetModuleTree", "compile_stage_set_module_tree", c.setModuleTree},
+		{"SetRuleTree", "compile_stage_set_rule_tree", c.setRuleTree},
+		{"SetGraph", "compile_stage_set_graph", c.setGraph},
+		{"RewriteComprehensionTerms", "compile_stage_rewrite_comprehension_terms", c.rewriteComprehensionTerms},
+		{"RewriteRefsInHead", "compile_stage_rewrite_refs_in_head", c.rewriteRefsInHead},
+		{"RewriteWithValues", "compile_stage_rewrite_with_values", c.rewriteWithModifiers},
+		{"CheckRuleConflicts", "compile_stage_check_rule_conflicts", c.checkRuleConflicts},
+		{"CheckSafetyRuleHeads", "compile_stage_check_safety_rule_heads", c.checkSafetyRuleHeads},
+		{"CheckSafetyRuleBodies", "compile_stage_check_safety_rule_bodies", c.checkSafetyRuleBodies},
+		{"RewriteEquals", "compile_stage_rewrite_equals", c.rewriteEquals},
+		{"RewriteDynamicTerms", "compile_stage_rewrite_dynamic_terms", c.rewriteDynamicTerms},
+		{"CheckRecursion", "compile_stage_check_recursion", c.checkRecursion},
+		{"CheckTypes", "compile_stage_check_types", c.checkTypes},
+		{"BuildRuleIndices", "compile_stage_rebuild_indices", c.buildRuleIndices},
 	}
 
 	return c
@@ -250,8 +255,15 @@ func (c *Compiler) WithPathConflictsCheck(fn func([]string) (bool, error)) *Comp
 
 // WithStageAfter registers a stage to run during compilation after
 // the named stage.
-func (c *Compiler) WithStageAfter(after string, stage CompilerStage) *Compiler {
+func (c *Compiler) WithStageAfter(after string, stage CompilerStageDefinition) *Compiler {
 	c.after[after] = append(c.after[after], stage)
+	return c
+}
+
+// WithMetrics will set a metrics.Metrics and be used for profiling
+// the Compiler instance.
+func (c *Compiler) WithMetrics(metrics metrics.Metrics) *Compiler {
+	c.metrics = metrics
 	return c
 }
 
@@ -271,6 +283,7 @@ func (c *Compiler) Compile(modules map[string]*Module) {
 		c.sorted = append(c.sorted, k)
 	}
 	sort.Strings(c.sorted)
+
 	c.compile()
 }
 
@@ -636,6 +649,22 @@ func (c *Compiler) checkTypes() {
 	c.TypeEnv = env
 }
 
+func (c *Compiler) runStage(metricName string, f func()) {
+	if c.metrics != nil {
+		c.metrics.Timer(metricName).Start()
+		defer c.metrics.Timer(metricName).Stop()
+	}
+	f()
+}
+
+func (c *Compiler) runStageAfter(metricName string, s CompilerStage) *Error {
+	if c.metrics != nil {
+		c.metrics.Timer(metricName).Start()
+		defer c.metrics.Timer(metricName).Stop()
+	}
+	return s(c)
+}
+
 func (c *Compiler) compile() {
 	defer func() {
 		if r := recover(); r != nil && r != errLimitReached {
@@ -644,11 +673,13 @@ func (c *Compiler) compile() {
 	}()
 
 	for _, s := range c.stages {
-		if s.f(); c.Failed() {
+		c.runStage(s.metricName, s.f)
+		if c.Failed() {
 			return
 		}
 		for _, s := range c.after[s.name] {
-			if err := s(c); err != nil {
+			err := c.runStageAfter(s.MetricName, s.Stage)
+			if err != nil {
 				c.err(err)
 			}
 		}
@@ -930,7 +961,7 @@ func (c *Compiler) rewriteWithModifiers() {
 			if !ok {
 				return x, nil
 			}
-			body, err := rewriteWithModifiersInBody(f, body, c.GetRules)
+			body, err := rewriteWithModifiersInBody(c, f, body)
 			if err != nil {
 				c.err(err)
 			}
@@ -958,14 +989,14 @@ type queryCompiler struct {
 	qctx      *QueryContext
 	typeEnv   *TypeEnv
 	rewritten map[Var]Var
-	after     map[string][]QueryCompilerStage
+	after     map[string][]QueryCompilerStageDefinition
 }
 
 func newQueryCompiler(compiler *Compiler) QueryCompiler {
 	qc := &queryCompiler{
 		compiler: compiler,
 		qctx:     nil,
-		after:    map[string][]QueryCompilerStage{},
+		after:    map[string][]QueryCompilerStageDefinition{},
 	}
 	return qc
 }
@@ -975,7 +1006,7 @@ func (qc *queryCompiler) WithContext(qctx *QueryContext) QueryCompiler {
 	return qc
 }
 
-func (qc *queryCompiler) WithStageAfter(after string, stage QueryCompilerStage) QueryCompiler {
+func (qc *queryCompiler) WithStageAfter(after string, stage QueryCompilerStageDefinition) QueryCompiler {
 	qc.after[after] = append(qc.after[after], stage)
 	return qc
 }
@@ -984,34 +1015,52 @@ func (qc *queryCompiler) RewrittenVars() map[Var]Var {
 	return qc.rewritten
 }
 
+func (qc *queryCompiler) runStage(metricName string, qctx *QueryContext, query Body, s func(*QueryContext, Body) (Body, error)) (Body, error) {
+	if qc.compiler.metrics != nil {
+		qc.compiler.metrics.Timer(metricName).Start()
+		defer qc.compiler.metrics.Timer(metricName).Stop()
+	}
+	return s(qctx, query)
+}
+
+func (qc *queryCompiler) runStageAfter(metricName string, query Body, s QueryCompilerStage) (Body, error) {
+	if qc.compiler.metrics != nil {
+		qc.compiler.metrics.Timer(metricName).Start()
+		defer qc.compiler.metrics.Timer(metricName).Stop()
+	}
+	return s(qc, query)
+}
+
 func (qc *queryCompiler) Compile(query Body) (Body, error) {
 
 	query = query.Copy()
 
 	stages := []struct {
-		name string
-		f    func(*QueryContext, Body) (Body, error)
+		name       string
+		metricName string
+		f          func(*QueryContext, Body) (Body, error)
 	}{
-		{"ResolveRefs", qc.resolveRefs},
-		{"RewriteAssignments", qc.rewriteLocalAssignments},
-		{"RewriteExprTerms", qc.rewriteExprTerms},
-		{"RewriteComprehensionTerms", qc.rewriteComprehensionTerms},
-		{"RewriteWithValues", qc.rewriteWithModifiers},
-		{"CheckSafety", qc.checkSafety},
-		{"RewriteDynamicTerms", qc.rewriteDynamicTerms},
-		{"CheckTypes", qc.checkTypes},
+		{"ResolveRefs", "query_compile_stage_resolve_refs", qc.resolveRefs},
+		{"RewriteAssignments", "query_compile_stage_rewrite_assignments", qc.rewriteLocalAssignments},
+		{"RewriteExprTerms", "query_compile_stage_rewrite_expr_terms", qc.rewriteExprTerms},
+		{"RewriteComprehensionTerms", "query_compile_stage_rewrite_comprehension_terms", qc.rewriteComprehensionTerms},
+		{"RewriteWithValues", "query_compile_stage_rewrite_with_values", qc.rewriteWithModifiers},
+		{"CheckSafety", "query_compile_stage_check_safety", qc.checkSafety},
+		{"RewriteDynamicTerms", "query_compile_stage_rewrite_dynamic_terms", qc.rewriteDynamicTerms},
+		{"CheckTypes", "query_compile_stage_check_types", qc.checkTypes},
 	}
 
 	qctx := qc.qctx.Copy()
 
 	for _, s := range stages {
 		var err error
-		if query, err = s.f(qctx, query); err != nil {
+		query, err = qc.runStage(s.metricName, qctx, query, s.f)
+		if err != nil {
 			return nil, qc.applyErrorLimit(err)
 		}
 		for _, s := range qc.after[s.name] {
-			var err error
-			if query, err = s(qc, query); err != nil {
+			query, err = qc.runStageAfter(s.MetricName, query, s.Stage)
+			if err != nil {
 				return nil, qc.applyErrorLimit(err)
 			}
 		}
@@ -1113,7 +1162,7 @@ func (qc *queryCompiler) checkTypes(qctx *QueryContext, body Body) (Body, error)
 
 func (qc *queryCompiler) rewriteWithModifiers(qctx *QueryContext, body Body) (Body, error) {
 	f := newEqualityFactory(newLocalVarGenerator(body))
-	body, err := rewriteWithModifiersInBody(f, body, qc.compiler.GetRules)
+	body, err := rewriteWithModifiersInBody(qc.compiler, f, body)
 	if err != nil {
 		return nil, Errors{err}
 	}
@@ -2181,9 +2230,11 @@ func rewriteComprehensionTerms(f *equalityFactory, node interface{}) (interface{
 // This stage should only run the safety check (since == is a built-in with no
 // outputs, so the inputs must not be marked as safe.)
 //
-// This stage is not executed by the query compiler because when callers specify
-// == instead of = they expect to receive a true/false/undefined result back
-// whereas with = the result is only ever true/undefined.
+// This stage is not executed by the query compiler by default because when
+// callers specify == instead of = they expect to receive a true/false/undefined
+// result back whereas with = the result is only ever true/undefined. For
+// partial evaluation cases we do want to rewrite == to = to simplify the
+// result.
 func rewriteEquals(x interface{}) {
 	doubleEq := Equal.Ref()
 	unifyOp := Equality.Ref()
@@ -2690,10 +2741,10 @@ func rewriteDeclaredVar(g *localVarGenerator, stack *localDeclaredVars, v Var) (
 // rewriteWithModifiersInBody will rewrite the body so that with modifiers do
 // not contain terms that require evaluation as values. If this function
 // encounters an invalid with modifier target then it will raise an error.
-func rewriteWithModifiersInBody(f *equalityFactory, body Body, getRules func(ref Ref) []*Rule) (Body, *Error) {
+func rewriteWithModifiersInBody(c *Compiler, f *equalityFactory, body Body) (Body, *Error) {
 	var result Body
 	for i := range body {
-		exprs, err := rewriteWithModifier(f, body[i], getRules)
+		exprs, err := rewriteWithModifier(c, f, body[i])
 		if err != nil {
 			return nil, err
 		}
@@ -2708,11 +2759,11 @@ func rewriteWithModifiersInBody(f *equalityFactory, body Body, getRules func(ref
 	return result, nil
 }
 
-func rewriteWithModifier(f *equalityFactory, expr *Expr, getRules func(ref Ref) []*Rule) ([]*Expr, *Error) {
+func rewriteWithModifier(c *Compiler, f *equalityFactory, expr *Expr) ([]*Expr, *Error) {
 
 	var result []*Expr
 	for i := range expr.With {
-		err := validateTarget(expr.With[i].Target, getRules)
+		err := validateTarget(c, expr.With[i].Target)
 		if err != nil {
 			return nil, err
 		}
@@ -2733,20 +2784,34 @@ func rewriteWithModifier(f *equalityFactory, expr *Expr, getRules func(ref Ref) 
 	return result, nil
 }
 
-func validateTarget(term *Term, getRules func(ref Ref) []*Rule) *Error {
+func validateTarget(c *Compiler, term *Term) *Error {
 	if !isInputRef(term) && !isDataRef(term) {
 		return NewError(TypeErr, term.Location, "with keyword target must start with %v or %v", InputRootDocument, DefaultRootDocument)
 	}
 
 	if isDataRef(term) {
-		if ref, ok := term.Value.(Ref); ok {
-			rules := getRules(ref)
-			for _, rule := range rules {
-				if len(rule.Head.Args) > 0 {
-					return NewError(CompileErr, term.Location, "with keyword cannot replace rules with arguments")
+		ref := term.Value.(Ref)
+		node := c.RuleTree
+		for i := 0; i < len(ref)-1; i++ {
+			child := node.Child(ref[i].Value)
+			if child == nil {
+				break
+			} else if len(child.Values) > 0 {
+				return NewError(CompileErr, term.Loc(), "with keyword cannot partially replace virtual document(s)")
+			}
+			node = child
+		}
+
+		if node != nil {
+			if child := node.Child(ref[len(ref)-1].Value); child != nil {
+				for _, value := range child.Values {
+					if len(value.(*Rule).Head.Args) > 0 {
+						return NewError(CompileErr, term.Loc(), "with keyword cannot replace functions")
+					}
 				}
 			}
 		}
+
 	}
 	return nil
 }

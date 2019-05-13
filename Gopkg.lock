@@ -845,7 +845,7 @@
   version = "v6.2.16"
 
 [[projects]]
-  digest = "1:4dbda3a99681a2fd853368c557699c900231beafafd714fc34f93c0207038b3d"
+  digest = "1:49c8bd2d0ab57797b2dbca6ef546c02ecbaae275bd7bd2666d8920ddba96fa2a"
   name = "github.com/open-policy-agent/opa"
   packages = [
     "ast",
@@ -871,8 +871,7 @@
     "util",
   ]
   pruneopts = "NUT"
-  revision = "0f39c27e2069be20c4a2ec0c8751b6132a681ac1"
-  version = "v0.10.7"
+  revision = "0ed56fef030cd8073937ac870dbef0d2fb59be58"
 
 [[projects]]
   digest = "1:7da29c22bcc5c2ffb308324377dc00b5084650348c2799e573ed226d8cc9faf0"
